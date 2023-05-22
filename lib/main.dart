@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:pinpoint/view/homepage.dart';
+import 'package:pinpoint/view/post.dart';
+import 'package:pinpoint/view/profile.dart';
+import 'package:pinpoint/view/search.dart';
+import 'firebase_options.dart';
+import 'package:pinpoint/view/feed.dart';
 
-
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'PinPoint',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -24,7 +33,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -32,28 +41,37 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-  final List<Widget> _widgetOptions = <Widget>[
-    Text('Home page'),
-    Text('Search Page'),
-    Text('Profile Page'),
-  ];
+  final PageController _pageController = PageController(initialPage: 0);
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _pageController.jumpToPage(index);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-
-      ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        onPageChanged: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        children: const <Widget>[
+          Homepage(),
+          Search(),
+          Post(),
+          Feed(),
+          Profile(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedIconTheme: const IconThemeData(color: Colors.deepPurple),
+        unselectedIconTheme: const IconThemeData(color: Colors.grey),
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.map),
@@ -62,6 +80,14 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_box),
+            label: 'Post',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Feed',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
