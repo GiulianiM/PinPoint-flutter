@@ -1,12 +1,8 @@
 import 'package:location/location.dart';
 
 class LocationProvider {
-  Location location = Location();
-
-  LocationData? getCurrentLocation() {
-    LocationData? currentLocation;
-
-    location.getLocation().then((actual) => currentLocation = actual);
-    return currentLocation;
+  Future<LocationData?> getCurrentLocation() async {
+    Location location = Location();
+    return await location.getLocation();
   }
 }

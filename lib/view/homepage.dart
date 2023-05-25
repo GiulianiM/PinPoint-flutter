@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -13,21 +15,25 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  late GoogleMapController mapController;
+ final Completer<GoogleMapController> _controller = Completer();
   late MapViewModel mapViewModel;
-  late LocationProvider location;
-  late LocationData? currentLocation;
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
+  LocationData? currentLocation;
+  late LocationProvider locationProvider;
 
   @override
   void initState() {
-    super.initState();
     mapViewModel = MapViewModel();
-    location = LocationProvider();
-    currentLocation = location.getCurrentLocation();
+    locationProvider = LocationProvider();
+    getCurrentLocation();
+    super.initState();
+  }
+
+  void getCurrentLocation() {
+    locationProvider.getCurrentLocation().then((locationData) {
+      setState(() {
+        currentLocation = locationData;
+      });
+    });
   }
 
   @override
@@ -59,7 +65,9 @@ class _HomepageState extends State<Homepage> {
                   infoWindow: const InfoWindow(title: 'Posizione attuale'),
                 ),
               },
-              onMapCreated: _onMapCreated,
+              onMapCreated: (GoogleMapController controller) {
+        _controller.complete(controller);
+      },
               zoomControlsEnabled: true, // Abilita i controlli di zoom
               compassEnabled: true, // Abilita la bussola
               myLocationButtonEnabled:
