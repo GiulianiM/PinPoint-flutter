@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:pinpoint/utils/location.dart';
+import 'package:permission_handler/permission_handler.dart'
+    as permission_handler;
 import 'package:pinpoint/viewmodel/homepage_viewmodel.dart';
 
 class Homepage extends StatefulWidget {
@@ -15,25 +16,90 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
- final Completer<GoogleMapController> _controller = Completer();
+  final Completer<GoogleMapController> _controller = Completer();
   late MapViewModel mapViewModel;
   LocationData? currentLocation;
-  late LocationProvider locationProvider;
+  BitmapDescriptor pinLocationIcon = BitmapDescriptor.defaultMarker;
+  Location location = Location();
+
+  void checkLocationPermissions() async {
+    Location location = Location();
+    PermissionStatus permissionStatus = await location.hasPermission();
+    if (permissionStatus == PermissionStatus.granted) {
+      getCurrentLocation();
+    } else if (permissionStatus == PermissionStatus.deniedForever) {
+      showPermissionDeniedDialog();
+    } else {
+      PermissionStatus requestedPermissionStatus =
+          await location.requestPermission();
+      if (requestedPermissionStatus == PermissionStatus.granted) {
+        getCurrentLocation();
+      } else {
+        // Permessi negati, impostare la posizione di default ad Ancona
+        setState(() {
+          currentLocation = LocationData.fromMap({
+            'latitude': 43.6168,
+            'longitude': 13.5189,
+          });
+        });
+      }
+    }
+  }
+
+  void showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Permessi di localizzazione'),
+          content: const Text(
+              'I permessi di localizzazione sono stati negati. Abilita la localizzazione nelle impostazioni dell\'app.'),
+          actions: [
+            TextButton(
+              child: const Text('Apri Impostazioni'),
+              onPressed: () {
+                permission_handler.openAppSettings();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void getCurrentLocation() async {
+    location.getLocation().then((that) {
+      setState(() {
+        currentLocation = that;
+      });
+    });
+
+    GoogleMapController mapController = await _controller.future;
+
+    location.onLocationChanged.listen((newLocation) {
+      //   mapController.animateCamera(
+      //     CameraUpdate.newCameraPosition(
+      //       CameraPosition(
+      //         target: LatLng(
+      //           newLocation.latitude!,
+      //           newLocation.longitude!,
+      //         ),
+      //         zoom: 18,
+      //       ),
+      //     ),
+      //   );
+
+      setState(() {
+        currentLocation = newLocation;
+      });
+    });
+  }
 
   @override
   void initState() {
     mapViewModel = MapViewModel();
-    locationProvider = LocationProvider();
-    getCurrentLocation();
+    checkLocationPermissions();
     super.initState();
-  }
-
-  void getCurrentLocation() {
-    locationProvider.getCurrentLocation().then((locationData) {
-      setState(() {
-        currentLocation = locationData;
-      });
-    });
   }
 
   @override
@@ -49,51 +115,18 @@ class _HomepageState extends State<Homepage> {
                   currentLocation!.latitude!,
                   currentLocation!.longitude!,
                 ),
-                zoom: 14.4746,
+                zoom: 18,
               ),
-              //markers: _createMarkers(),
-              markers: {
-                Marker(
-                  markerId: const MarkerId('1'),
-                  icon: BitmapDescriptor.defaultMarker,
-                  position: LatLng(
-                    currentLocation!.latitude!,
-                    currentLocation!.longitude!,
-                  ),
-                  anchor: const Offset(0.5, 0.5),
-                  zIndex: 2,
-                  infoWindow: const InfoWindow(title: 'Posizione attuale'),
-                ),
+              onMapCreated: (mapController) {
+                _controller.complete(mapController);
               },
-              onMapCreated: (GoogleMapController controller) {
-        _controller.complete(controller);
-      },
-              zoomControlsEnabled: true, // Abilita i controlli di zoom
-              compassEnabled: true, // Abilita la bussola
-              myLocationButtonEnabled:
-                  true, // Abilita il pulsante per centrare sulla posizione attuale
-              myLocationEnabled:
-                  true, // Abilita la visualizzazione della posizione attuale
-              tiltGesturesEnabled: true, // Abilita i gesti di tilt
-              rotateGesturesEnabled: true, // Abilita i gesti di rotazione
+              zoomControlsEnabled: false,
+              compassEnabled: true,
+              myLocationButtonEnabled: true,
+              myLocationEnabled: true,
+              tiltGesturesEnabled: true,
+              rotateGesturesEnabled: true,
             ),
     ));
   }
-
-  // Set<Marker> _createMarkers() {
-  //   final markers = <Marker>{};
-
-  //   Marker marker = const Marker(
-  //     markerId: ,
-  //     icon: ,
-  //     position: LatLng(0, 0),
-  //     anchor: Offset(0.5, 0.5),
-  //     zIndex: 2,
-  //     infoWindow: InfoWindow(title: 'Posizione attuale'),
-  //   );
-
-  //   markers.add(marker);
-
-  //   return markers;
-  // }
 }

@@ -10,7 +10,7 @@ class SearchResultItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundImage: AssetImage(user.profileImage),
+        backgroundImage: AssetImage(user.image),
       ),
       title: Text(user.username),
       subtitle: Text(user.fullName),
