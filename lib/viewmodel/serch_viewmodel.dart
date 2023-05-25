@@ -17,7 +17,7 @@ class SearchViewModel {
       return;
     }
     final searchResults =
-        _users.where((user) => user.username.contains(query)).toList();
+        _users.where((user) => user.username!.contains(query)).toList();
     _searchResultsController.sink.add(searchResults);
   }
 

@@ -1,21 +1,22 @@
 class User {
-  final String bio;
-  final String email;
-  final String fullName;
-  final String image;
-  final String latitude;
-  final String longitude;
-  final String uid;
-  final String username;
+  final String? bio;
+  final String? email;
+  final String? fullName;
+  final String? image;
+  final String? latitude;
+  final String? longitude;
+  final String? uid;
+  final String? username;
 
   User({
-    required this.username,
-    required this.fullName,
-    required this.image,
-    required this.bio,
-    required this.email,
-    required this.latitude,
-    required this.longitude,
-    required this.uid,
+    this.username,
+    this.fullName,
+    this.image,
+    this.bio,
+    this.email,
+    this.latitude,
+    this.longitude,
+    this.uid,
   });
+
 }

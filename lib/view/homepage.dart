@@ -1,11 +1,17 @@
 import 'dart:async';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart'
     as permission_handler;
+import 'package:pinpoint/repo/database_queries.dart';
 import 'package:pinpoint/viewmodel/homepage_viewmodel.dart';
+import '../model/user.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -17,10 +23,60 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   final Completer<GoogleMapController> _controller = Completer();
+  final defaultLatitude = "43.6168";
+  final defaultLongitude = "13.5189";
   late MapViewModel mapViewModel;
   LocationData? currentLocation;
   BitmapDescriptor pinLocationIcon = BitmapDescriptor.defaultMarker;
   Location location = Location();
+  DatabaseQueries databaseQueries = DatabaseQueries();
+  Set<Marker> markers = {};
+  Uint8List? markerIcon;
+
+  // ritorna l'icona del marker con la foto del profilo dell'utente
+  Future<Uint8List> getMarkerIcon(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    final imageData = response.bodyBytes;
+    final size = 120;
+
+    ui.Codec codec =
+    await ui.instantiateImageCodec(imageData, targetWidth: size);
+    ui.FrameInfo info = await codec.getNextFrame();
+    return (await info.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
+  }
+
+  Future<void> updateMarkers(List<User> userList) async {
+    final Uint8List defaultIcon = await getMarkerIcon(
+        'https://firebasestorage.googleapis.com/v0/b/pinpointmvvm.appspot.com/o/Default%20Images%2FProfilePicture.png?alt=media&token=780391e3-37ee-4352-8367-f4c08b0f809d');
+
+    final List<Marker> updatedMarkers = await Future.wait(
+      userList.map((user) async {
+        final String imageUrl =
+            user.image ?? ''; // URL dell'immagine del profilo
+
+        final Uint8List markerIcon =
+            imageUrl.isNotEmpty ? await getMarkerIcon(imageUrl) : defaultIcon;
+
+        return Marker(
+          markerId: MarkerId(user.uid ?? ''),
+          position: LatLng(
+            double.parse(user.latitude ?? defaultLatitude),
+            double.parse(user.longitude ?? defaultLongitude),
+          ),
+          icon: BitmapDescriptor.fromBytes(markerIcon),
+          infoWindow: InfoWindow(
+            title: user.username ?? '',
+          ),
+        );
+      }),
+    );
+
+    setState(() {
+      markers = updatedMarkers.toSet();
+    });
+  }
 
   void checkLocationPermissions() async {
     Location location = Location();
@@ -38,8 +94,8 @@ class _HomepageState extends State<Homepage> {
         // Permessi negati, impostare la posizione di default ad Ancona
         setState(() {
           currentLocation = LocationData.fromMap({
-            'latitude': 43.6168,
-            'longitude': 13.5189,
+            'latitude': double.parse(defaultLatitude),
+            'longitude': double.parse(defaultLongitude),
           });
         });
       }
@@ -97,6 +153,9 @@ class _HomepageState extends State<Homepage> {
 
   @override
   void initState() {
+    databaseQueries.getAllUsersExceptMe().then((userList) {
+      updateMarkers(userList);
+    });
     mapViewModel = MapViewModel();
     checkLocationPermissions();
     super.initState();
@@ -120,6 +179,8 @@ class _HomepageState extends State<Homepage> {
               onMapCreated: (mapController) {
                 _controller.complete(mapController);
               },
+              markers: markers,
+              mapToolbarEnabled: false,
               zoomControlsEnabled: false,
               compassEnabled: true,
               myLocationButtonEnabled: true,
