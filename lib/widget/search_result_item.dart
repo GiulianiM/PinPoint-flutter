@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pinpoint/model/user.dart';
+import 'package:pinpoint/model/utente.dart';
 
 class SearchResultItem extends StatelessWidget {
   final User user;

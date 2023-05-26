@@ -1,4 +1,4 @@
-class User {
+class Utente {
   final String? bio;
   final String? email;
   final String? fullName;
@@ -8,7 +8,7 @@ class User {
   final String? uid;
   final String? username;
 
-  User({
+  Utente({
     this.username,
     this.fullName,
     this.image,
@@ -18,5 +18,4 @@ class User {
     this.longitude,
     this.uid,
   });
-
 }

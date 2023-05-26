@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:pinpoint/repo/database_queries.dart';
 import 'package:pinpoint/view/homepage.dart';
 import 'package:pinpoint/view/post.dart';
 import 'package:pinpoint/view/profile.dart';
@@ -12,6 +13,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(const MyApp());
 }
 
@@ -27,7 +29,32 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(),
+      home: FutureBuilder<bool>(
+        future: DatabaseQueries().loginWithEmail(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          } else {
+            if (snapshot.hasError || snapshot.data == false) {
+              final snackBar = SnackBar(
+                content: Text('Errore durante il login. Riprova.'),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              return Scaffold(
+                body: Container(
+                  color: Colors.white,
+                ),
+              );
+            } else {
+              return const MyHomePage();
+            }
+          }
+        },
+      ),
     );
   }
 }

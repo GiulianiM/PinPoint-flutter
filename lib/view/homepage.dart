@@ -11,7 +11,7 @@ import 'package:permission_handler/permission_handler.dart'
 import 'package:pinpoint/repo/database_queries.dart';
 import 'package:pinpoint/viewmodel/homepage_viewmodel.dart';
 
-import '../model/user.dart';
+import '../model/utente.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -33,7 +33,7 @@ class _HomepageState extends State<Homepage> {
   Set<Marker> markers = {};
   Uint8List? markerIcon;
 
-  Future<void> updateMarkers(List<User> userList) async {
+  Future<void> updateMarkers(List<Utente> userList) async {
     final String defaultIcon =
         'https://firebasestorage.googleapis.com/v0/b/pinpointmvvm.appspot.com/o/Default%20Images%2FProfilePicture.png?alt=media&token=780391e3-37ee-4352-8367-f4c08b0f809d';
 

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:pinpoint/model/user.dart';
+import 'package:pinpoint/model/utente.dart';
 import 'package:flutter/material.dart';
 
 class SearchViewModel {

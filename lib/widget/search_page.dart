@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pinpoint/model/user.dart';
+import 'package:pinpoint/model/utente.dart';
 import 'package:pinpoint/viewmodel/serch_viewmodel.dart';
 import 'package:pinpoint/widget/search_box.dart';
 import 'package:pinpoint/widget/search_result_item.dart';
