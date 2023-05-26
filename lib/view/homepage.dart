@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 
+import 'package:custom_marker/marker_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart'
     as permission_handler;
 import 'package:pinpoint/repo/database_queries.dart';
 import 'package:pinpoint/viewmodel/homepage_viewmodel.dart';
+
 import '../model/user.dart';
 
 class Homepage extends StatefulWidget {
@@ -33,39 +33,25 @@ class _HomepageState extends State<Homepage> {
   Set<Marker> markers = {};
   Uint8List? markerIcon;
 
-  // ritorna l'icona del marker con la foto del profilo dell'utente
-  Future<Uint8List> getMarkerIcon(String imageUrl) async {
-    final response = await http.get(Uri.parse(imageUrl));
-    final imageData = response.bodyBytes;
-    final size = 120;
-
-    ui.Codec codec =
-    await ui.instantiateImageCodec(imageData, targetWidth: size);
-    ui.FrameInfo info = await codec.getNextFrame();
-    return (await info.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
-  }
-
   Future<void> updateMarkers(List<User> userList) async {
-    final Uint8List defaultIcon = await getMarkerIcon(
-        'https://firebasestorage.googleapis.com/v0/b/pinpointmvvm.appspot.com/o/Default%20Images%2FProfilePicture.png?alt=media&token=780391e3-37ee-4352-8367-f4c08b0f809d');
+    final String defaultIcon =
+        'https://firebasestorage.googleapis.com/v0/b/pinpointmvvm.appspot.com/o/Default%20Images%2FProfilePicture.png?alt=media&token=780391e3-37ee-4352-8367-f4c08b0f809d';
 
     final List<Marker> updatedMarkers = await Future.wait(
       userList.map((user) async {
-        final String imageUrl =
-            user.image ?? ''; // URL dell'immagine del profilo
-
-        final Uint8List markerIcon =
-            imageUrl.isNotEmpty ? await getMarkerIcon(imageUrl) : defaultIcon;
-
         return Marker(
           markerId: MarkerId(user.uid ?? ''),
           position: LatLng(
             double.parse(user.latitude ?? defaultLatitude),
             double.parse(user.longitude ?? defaultLongitude),
           ),
-          icon: BitmapDescriptor.fromBytes(markerIcon),
+          icon: await MarkerIcon.downloadResizePictureCircle(
+            user.image ?? defaultIcon,
+            size: 120,
+            addBorder: true,
+            borderColor: Colors.blue,
+            borderSize: 15,
+          ),
           infoWindow: InfoWindow(
             title: user.username ?? '',
           ),
