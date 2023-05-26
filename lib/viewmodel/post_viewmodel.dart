@@ -3,15 +3,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../model/post.dart';
+import '../repo/database_queries.dart';
+
 class PostViewModel extends ChangeNotifier {
   late ImagePicker _imagePicker;
   ImageProvider<Object>? _imageProvider;
   final TextEditingController _descriptionController = TextEditingController();
+  final DatabaseQueries _databaseQueries = DatabaseQueries();
 
   PostViewModel() {
     _imagePicker = ImagePicker();
     _imageProvider =
-        const AssetImage('assets/images/default_profile_image.jpg');
+        const AssetImage('assets/images/default.png');
   }
 
   ImageProvider<Object>? get imageProvider => _imageProvider;
@@ -27,9 +31,9 @@ class PostViewModel extends ChangeNotifier {
   }
 
   void uploadPost() async {
-    // Implementa l'azione di caricamento del post
-    // Utilizza il testo nel campo di descrizione (_descriptionController.text)
-    // e l'immagine selezionata (_imageProvider) per caricare il post sul profilo dell'utente
+    //TODO Crea il post qui
+    Post post = Post();
+    await _databaseQueries.savePost(post);
   }
 
   @override

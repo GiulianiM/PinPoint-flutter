@@ -32,9 +32,10 @@ class _HomepageState extends State<Homepage> {
   DatabaseQueries databaseQueries = DatabaseQueries();
   Set<Marker> markers = {};
   Uint8List? markerIcon;
+  StreamSubscription<LocationData>? locationSubscription;
 
   Future<void> updateMarkers(List<Utente> userList) async {
-    final String defaultIcon =
+    const String defaultIcon =
         'https://firebasestorage.googleapis.com/v0/b/pinpointmvvm.appspot.com/o/Default%20Images%2FProfilePicture.png?alt=media&token=780391e3-37ee-4352-8367-f4c08b0f809d';
 
     final List<Marker> updatedMarkers = await Future.wait(
@@ -111,6 +112,28 @@ class _HomepageState extends State<Homepage> {
 
   void getCurrentLocation() async {
     location.getLocation().then((that) {
+      if (mounted) {
+        // Controlla se il widget è ancora montato
+        setState(() {
+          currentLocation = that;
+        });
+      }
+    });
+
+    GoogleMapController mapController = await _controller.future;
+
+    locationSubscription = location.onLocationChanged.listen((newLocation) {
+      if (mounted) {
+        // Controlla se il widget è ancora montato
+        setState(() {
+          currentLocation = newLocation;
+        });
+      }
+    });
+  }
+
+  /*void getCurrentLocation() async {
+    location.getLocation().then((that) {
       setState(() {
         currentLocation = that;
       });
@@ -136,7 +159,7 @@ class _HomepageState extends State<Homepage> {
       });
     });
   }
-
+*/
   @override
   void initState() {
     databaseQueries.getAllUsersExceptMe().then((userList) {
@@ -175,5 +198,12 @@ class _HomepageState extends State<Homepage> {
               rotateGesturesEnabled: true,
             ),
     ));
+  }
+
+  @override
+  void dispose() {
+    locationSubscription
+        ?.cancel(); // Annulla l'ascolto dell'evento onLocationChanged
+    super.dispose();
   }
 }

@@ -1,35 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:pinpoint/model/post.dart';
+import 'package:pinpoint/model/utente.dart';
 
 class PostWidget extends StatelessWidget {
-  const PostWidget({Key? key}) : super(key: key);
+  final Post posts;
+  final Utente utente;
+  const PostWidget({Key? key, required this.posts, required this.utente})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    const defaultIcon =
+        'https://firebasestorage.googleapis.com/v0/b/pinpointmvvm.appspot.com/o/Default%20Images%2FProfilePicture.png?alt=media&token=780391e3-37ee-4352-8367-f4c08b0f809d';
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               CircleAvatar(
-                backgroundImage: AssetImage('assets/images/default_profile_image.jpg'),
+                backgroundImage: NetworkImage(posts.imageUrl ?? defaultIcon),
                 radius: 20,
               ),
-              SizedBox(width: 8.0),
+              const SizedBox(width: 8.0),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Username',
-                    style: TextStyle(
+                    utente.username ?? 'Username',
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16.0,
                     ),
                   ),
                   Text(
-                    'Posizione',
-                    style: TextStyle(fontSize: 14.0),
+                    '${posts.latitude} ${posts.longitude}',
+                    style: const TextStyle(fontSize: 14.0),
                   ),
                 ],
               ),
@@ -41,7 +48,7 @@ class PostWidget extends StatelessWidget {
               color: Colors.grey,
               borderRadius: BorderRadius.circular(8.0),
             ),
-            child: Image.asset('assets/images/default_profile_image.jpg'),
+            child: Image.network(posts.imageUrl ?? defaultIcon),
             // Qui puoi inserire l'immagine dell'utente
             // utilizzando una delle seguenti opzioni:
             // - Image.network(url),
@@ -51,9 +58,9 @@ class PostWidget extends StatelessWidget {
             // in base al riquadro del contenitore.
           ),
           const SizedBox(height: 8.0),
-          const Text(
-            'Descrizione del post',
-            style: TextStyle(fontSize: 16.0),
+          Text(
+            posts.description ?? 'Description',
+            style: const TextStyle(fontSize: 16.0),
           ),
         ],
       ),

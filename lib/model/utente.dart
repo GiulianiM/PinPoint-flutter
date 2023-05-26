@@ -1,16 +1,16 @@
 class Utente {
-  final String? bio;
-  final String? email;
-  final String? fullName;
-  final String? image;
-  final String? latitude;
-  final String? longitude;
-  final String? uid;
-  final String? username;
+  String? bio;
+  String? email;
+  String? fullname;
+  String? image;
+  String? latitude;
+  String? longitude;
+  String? uid;
+  String? username;
 
   Utente({
     this.username,
-    this.fullName,
+    this.fullname,
     this.image,
     this.bio,
     this.email,

@@ -1,11 +1,11 @@
 class Post {
-  final String? postId;
-  final String? userId;
-  final String? latitude;
-  final String? longitude;
-  final String? description;
-  final String? imageUrl;
-  final String? date;
+  String? postId;
+  String? userId;
+  String? latitude;
+  String? longitude;
+  String? description;
+  String? imageUrl;
+  String? date;
 
   Post({
     this.postId,
@@ -16,4 +16,16 @@ class Post {
     this.imageUrl,
     this.date,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'postId': postId,
+      'userId': userId,
+      'latitude': latitude,
+      'longitude': longitude,
+      'description': description,
+      'imageUrl': imageUrl,
+      'date': date,
+    };
+  }
 }
