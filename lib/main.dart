@@ -13,7 +13,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  DatabaseQueries().loginWithEmail();
   runApp(const MyApp());
 }
 
@@ -29,32 +29,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: FutureBuilder<bool>(
-        future: DatabaseQueries().loginWithEmail(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          } else {
-            if (snapshot.hasError || snapshot.data == false) {
-              final snackBar = const SnackBar(
-                content: Text('Errore durante il login. Riprova.'),
-              );
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              return Scaffold(
-                body: Container(
-                  color: Colors.white,
-                ),
-              );
-            } else {
-              return const MyHomePage();
-            }
-          }
-        },
-      ),
+      home: const MyHomePage(),
     );
   }
 }

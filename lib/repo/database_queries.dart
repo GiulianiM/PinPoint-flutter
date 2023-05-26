@@ -15,12 +15,10 @@ class DatabaseQueries {
 
   Future<bool> loginWithEmail() async {
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      User? user = userCredential.user;
       return true;
     } catch (e) {
       return false;
@@ -29,7 +27,6 @@ class DatabaseQueries {
 
   Future<List<Utente>> getAllUsersExceptMe() {
     final completer = Completer<List<Utente>>();
-  
 
     _usersRef.onValue.listen((event) {
       final data = event.snapshot.value as Map<dynamic, dynamic>?;
