@@ -41,7 +41,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
           Expanded(
-            child: StreamBuilder<List<User>>(
+            child: StreamBuilder<List<Utente>>(
               stream: _viewModel.searchResultsStream,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {

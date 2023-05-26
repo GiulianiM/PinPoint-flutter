@@ -33,14 +33,14 @@ class MyApp extends StatelessWidget {
         future: DatabaseQueries().loginWithEmail(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Scaffold(
+            return const Scaffold(
               body: Center(
                 child: CircularProgressIndicator(),
               ),
             );
           } else {
             if (snapshot.hasError || snapshot.data == false) {
-              final snackBar = SnackBar(
+              final snackBar = const SnackBar(
                 content: Text('Errore durante il login. Riprova.'),
               );
               ScaffoldMessenger.of(context).showSnackBar(snackBar);

@@ -4,12 +4,12 @@ import 'package:pinpoint/model/utente.dart';
 import 'package:flutter/material.dart';
 
 class SearchViewModel {
-  late final List<User> _users;
+  late final List<Utente> _users;
   final TextEditingController searchController = TextEditingController();
-  final StreamController<List<User>> _searchResultsController =
-      StreamController<List<User>>.broadcast();
+  final StreamController<List<Utente>> _searchResultsController =
+      StreamController<List<Utente>>.broadcast();
 
-  Stream<List<User>> get searchResultsStream => _searchResultsController.stream;
+  Stream<List<Utente>> get searchResultsStream => _searchResultsController.stream;
 
   void searchUsers(String query) {
     if(query.isEmpty){

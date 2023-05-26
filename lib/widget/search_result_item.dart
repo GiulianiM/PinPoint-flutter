@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pinpoint/model/utente.dart';
 
 class SearchResultItem extends StatelessWidget {
-  final User user;
+  final Utente user;
 
   const SearchResultItem({Key? key, required this.user}) : super(key: key);
 
