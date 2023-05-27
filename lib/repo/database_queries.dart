@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:pinpoint/model/post.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,7 +16,6 @@ class DatabaseQueries {
   final email = "prova@prova.com";
   final password = "prova123";
 
-
   Future<bool> loginWithEmail() async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -26,6 +26,12 @@ class DatabaseQueries {
     } catch (e) {
       return false;
     }
+  }
+
+  Future<String> getCurrentUserUid() async {
+    final completer = Completer<String>();
+    completer.complete(_auth.currentUser!.uid);
+    return completer.future;
   }
 
   Future<Utente> getCurrentUserInfo() {
@@ -60,17 +66,18 @@ class DatabaseQueries {
       if (data != null) {
         final userList = data.entries
             .where((entry) => entry.key != _auth.currentUser!.uid)
-        .where((entry) => entry.value['username'].toString().contains(username))
+            .where((entry) =>
+                entry.value['username'].toString().contains(username))
             .map((entry) => Utente(
-          username: entry.value['username'] as String?,
-          fullname: entry.value['fullname'] as String?,
-          image: entry.value['image'] as String?,
-          bio: entry.value['bio'] as String?,
-          email: entry.value['email'] as String?,
-          latitude: entry.value['latitude'] as String?,
-          longitude: entry.value['longitude'] as String?,
-          uid: entry.value['uid'] as String?,
-        ))
+                  username: entry.value['username'] as String?,
+                  fullname: entry.value['fullname'] as String?,
+                  image: entry.value['image'] as String?,
+                  bio: entry.value['bio'] as String?,
+                  email: entry.value['email'] as String?,
+                  latitude: entry.value['latitude'] as String?,
+                  longitude: entry.value['longitude'] as String?,
+                  uid: entry.value['uid'] as String?,
+                ))
             .toList();
         completer.complete(userList);
       }
@@ -116,19 +123,18 @@ class DatabaseQueries {
         data.forEach((idUtente, postMap) {
           if (idUtente != _auth.currentUser!.uid) {
             postMap.forEach((idPost, postData) {
-              final user = utenti.singleWhere((element) =>
-              element.uid == idUtente);
+              final user =
+                  utenti.singleWhere((element) => element.uid == idUtente);
               final post = Post(
-                postId: idPost,
-                userId: idUtente as String?,
-                date: postData['date'] as String?,
-                imageUrl: postData['imageUrl'] as String?,
-                latitude: postData['latitude'] as String?,
-                longitude: postData['longitude'] as String?,
-                description: postData['description'] as String?,
-                username: user.username,
-                userPic: user.image
-              );
+                  postId: idPost,
+                  userId: idUtente as String?,
+                  date: postData['date'] as String?,
+                  imageUrl: postData['imageUrl'] as String?,
+                  latitude: postData['latitude'] as String?,
+                  longitude: postData['longitude'] as String?,
+                  description: postData['description'] as String?,
+                  username: user.username,
+                  userPic: user.image);
               postList.add(post);
             });
           }
@@ -163,8 +169,7 @@ class DatabaseQueries {
                   longitude: postData['longitude'] as String?,
                   description: postData['description'] as String?,
                   username: currentUser.username,
-                  userPic: currentUser.image
-              );
+                  userPic: currentUser.image);
               postList.add(post);
             });
           }
@@ -180,7 +185,7 @@ class DatabaseQueries {
   Future<void> savePost(Post post) {
     final Completer<void> completer = Completer<void>();
 
-    _postsRef.child(post.userId!).set(post.toMap()).then((_) {
+    _postsRef.child(post.userId!).child(getRandomString(10)).set(post.toMap()).then((_) {
       completer.complete();
     }).catchError((error) {
       completer.completeError(error);
@@ -190,18 +195,26 @@ class DatabaseQueries {
   }
 
   Future<int> getFollowerCount() async {
-    DataSnapshot snapshot = await _followsRef.child(_auth.currentUser!.uid).child('followers').get();
+    DataSnapshot snapshot = await _followsRef
+        .child(_auth.currentUser!.uid)
+        .child('followers')
+        .get();
     if (snapshot.value != null && snapshot.value is Map) {
-      Map<String, dynamic> followers = Map<String, dynamic>.from(snapshot.value as Map);
+      Map<String, dynamic> followers =
+          Map<String, dynamic>.from(snapshot.value as Map);
       return followers.length;
     }
     return 0;
   }
 
   Future<int> getFollowingCount() async {
-    DataSnapshot snapshot = await _followsRef.child(_auth.currentUser!.uid).child('following').get();
+    DataSnapshot snapshot = await _followsRef
+        .child(_auth.currentUser!.uid)
+        .child('following')
+        .get();
     if (snapshot.value != null && snapshot.value is Map) {
-      Map<String, dynamic> followers = Map<String, dynamic>.from(snapshot.value as Map);
+      Map<String, dynamic> followers =
+          Map<String, dynamic>.from(snapshot.value as Map);
       return followers.length;
     }
     return 0;
@@ -210,9 +223,21 @@ class DatabaseQueries {
   Future<int> getPostCount() async {
     DataSnapshot snapshot = await _postsRef.child(_auth.currentUser!.uid).get();
     if (snapshot.value != null && snapshot.value is Map) {
-      Map<String, dynamic> posts = Map<String, dynamic>.from(snapshot.value as Map);
+      Map<String, dynamic> posts =
+          Map<String, dynamic>.from(snapshot.value as Map);
       return posts.length;
     }
     return 0;
   }
+
+  String getRandomString(int length) {
+    final random = Random();
+    const availableChars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    final randomString = List.generate(length,
+            (index) => availableChars[random.nextInt(availableChars.length)]).join();
+
+    return randomString;
+  }
+
 }

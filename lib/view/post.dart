@@ -15,6 +15,7 @@ class Post extends StatelessWidget {
 }
 
 class _PostState extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<PostViewModel>(context);
@@ -64,7 +65,12 @@ class _PostState extends StatelessWidget {
                   ),
                   const SizedBox(width: 16.0),
                   ElevatedButton(
-                    onPressed: viewModel.uploadPost,
+                    onPressed: () {
+                      viewModel.uploadPost(
+                        viewModel.imageProvider!,
+                        viewModel.descriptionController.text
+                      );
+                    },
                     child: const Text('Carica'),
                   ),
                 ],
