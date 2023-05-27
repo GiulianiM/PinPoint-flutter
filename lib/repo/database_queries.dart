@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/foundation.dart';
 import 'package:pinpoint/model/post.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pinpoint/model/utente.dart';
@@ -105,7 +104,7 @@ class DatabaseQueries {
     return completer.future;
   }
 
-  Future<List<Post>> getAllPostsExceptMine() async {
+  Future<List<Post>> getAllPostsExceptMine(List<Utente> utenti) async {
     final completer = Completer<List<Post>>();
 
     _postsRef.onValue.listen((event) {
@@ -117,6 +116,8 @@ class DatabaseQueries {
         data.forEach((idUtente, postMap) {
           if (idUtente != _auth.currentUser!.uid) {
             postMap.forEach((idPost, postData) {
+              final user = utenti.singleWhere((element) =>
+              element.uid == idUtente);
               final post = Post(
                 postId: idPost,
                 userId: idUtente as String?,
@@ -125,6 +126,8 @@ class DatabaseQueries {
                 latitude: postData['latitude'] as String?,
                 longitude: postData['longitude'] as String?,
                 description: postData['description'] as String?,
+                username: user.username,
+                userPic: user.image
               );
               postList.add(post);
             });
@@ -139,9 +142,10 @@ class DatabaseQueries {
   }
 
   Future<List<Post>> getAllMinePosts() async {
+    final currentUser = await getCurrentUserInfo();
     final completer = Completer<List<Post>>();
 
-    _postsRef.child(_auth.currentUser!.uid).onValue.listen((event) {
+    _postsRef.onValue.listen((event) {
       final data = event.snapshot.value as Map<dynamic, dynamic>?;
 
       if (data != null) {
@@ -151,13 +155,15 @@ class DatabaseQueries {
           if (idUtente == _auth.currentUser!.uid) {
             postMap.forEach((idPost, postData) {
               final post = Post(
-                postId: idPost,
-                userId: idUtente as String?,
-                date: postData['date'] as String?,
-                imageUrl: postData['imageUrl'] as String?,
-                latitude: postData['latitude'] as String?,
-                longitude: postData['longitude'] as String?,
-                description: postData['description'] as String?,
+                  postId: idPost,
+                  userId: idUtente as String?,
+                  date: postData['date'] as String?,
+                  imageUrl: postData['imageUrl'] as String?,
+                  latitude: postData['latitude'] as String?,
+                  longitude: postData['longitude'] as String?,
+                  description: postData['description'] as String?,
+                  username: currentUser.username,
+                  userPic: currentUser.image
               );
               postList.add(post);
             });

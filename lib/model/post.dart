@@ -6,6 +6,8 @@ class Post {
   String? description;
   String? imageUrl;
   String? date;
+  String? userPic;
+  String? username;
 
   Post({
     this.postId,
@@ -15,6 +17,8 @@ class Post {
     this.description,
     this.imageUrl,
     this.date,
+    this.username,
+    this.userPic
   });
 
   Map<String, dynamic> toMap() {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pinpoint/model/post.dart';
 import 'package:pinpoint/repo/database_queries.dart';
+import 'package:pinpoint/widget/post_widget.dart';
 
 class Feed extends StatefulWidget {
   const Feed({Key? key}) : super(key: key);
@@ -19,7 +20,9 @@ class _FeedState extends State<Feed> {
   }
 
   void _fetchPosts() async {
-    final posts = await DatabaseQueries().getAllPostsExceptMine();
+    final posts = await DatabaseQueries()
+        .getAllUsersExceptMe()
+        .then((utenti) => DatabaseQueries().getAllPostsExceptMine(utenti));
     setState(() {
       _postList = posts;
     });
@@ -37,25 +40,7 @@ class _FeedState extends State<Feed> {
         itemCount: _postList.length,
         itemBuilder: (context, index) {
           final post = _postList[index];
-          return Container(
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  post.userId ?? '',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text(post.description ?? ''),
-              ],
-            ),
-          );
+          return PostWidget(post: post);
         },
       ),
     );
