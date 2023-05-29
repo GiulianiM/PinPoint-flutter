@@ -1,4 +1,7 @@
+
 import 'package:flutter/material.dart';
+import 'package:pinpoint/main.dart';
+import 'package:pinpoint/view/homepage.dart';
 import 'package:pinpoint/viewmodel/post_viewmodel.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +17,13 @@ class Post extends StatelessWidget {
   }
 }
 
-class _PostState extends StatelessWidget {
+class _PostState extends StatefulWidget {
+
+  @override
+  State<_PostState> createState() => _PostStateState();
+}
+
+class _PostStateState extends State<_PostState> {
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +31,13 @@ class _PostState extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-          title: const Center(
-              child: Text('Carica Post',
-                  style: TextStyle(fontWeight: FontWeight.bold)))),
+        title: const Center(
+          child: Text(
+            'Carica Post',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -37,14 +50,15 @@ class _PostState extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
               child: TextFormField(
                 controller: viewModel.descriptionController,
                 decoration: InputDecoration(
                   hintText: 'Inserisci una descrizione',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
-                    icon: Icon(Icons.clear),
+                    icon: const Icon(Icons.clear),
                     onPressed: () {
                       viewModel.descriptionController.clear();
                     },
@@ -52,7 +66,6 @@ class _PostState extends StatelessWidget {
                 ),
                 maxLines: 2,
               ),
-
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
@@ -70,13 +83,15 @@ class _PostState extends StatelessWidget {
                         viewModel.imageProvider!,
                         viewModel.descriptionController.text
                       );
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => const MyHomePage()),
+                      );
                     },
                     child: const Text('Carica'),
                   ),
                 ],
               ),
             ),
-
           ],
         ),
       ),

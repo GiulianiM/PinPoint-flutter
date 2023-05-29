@@ -13,6 +13,7 @@ class PostWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     const defaultIcon =
         'https://firebasestorage.googleapis.com/v0/b/pinpointmvvm.appspot.com/o/Default%20Images%2FProfilePicture.png?alt=media&token=780391e3-37ee-4352-8367-f4c08b0f809d';
+    String datePart = post.date!.substring(0, 10);
 
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -60,6 +61,10 @@ class PostWidget extends StatelessWidget {
           const SizedBox(height: 8.0),
           Text(
             post.description ?? 'Description',
+            style: const TextStyle(fontSize: 16.0),
+          ),
+          Text(
+            datePart ?? 'Data',
             style: const TextStyle(fontSize: 16.0),
           ),
         ],

@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MyHomePage(),
+      initialRoute: '/',
     );
   }
 }
@@ -88,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Post',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.feed),
             label: 'Feed',
           ),
           BottomNavigationBarItem(

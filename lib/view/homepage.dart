@@ -9,7 +9,6 @@ import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart'
     as permission_handler;
 import 'package:pinpoint/repo/database_queries.dart';
-import 'package:pinpoint/viewmodel/homepage_viewmodel.dart';
 
 import '../model/utente.dart';
 
@@ -25,7 +24,6 @@ class _HomepageState extends State<Homepage> {
   final Completer<GoogleMapController> _controller = Completer();
   final defaultLatitude = "43.6168";
   final defaultLongitude = "13.5189";
-  late MapViewModel mapViewModel;
   LocationData? currentLocation;
   BitmapDescriptor pinLocationIcon = BitmapDescriptor.defaultMarker;
   Location location = Location();
@@ -48,7 +46,7 @@ class _HomepageState extends State<Homepage> {
           ),
           icon: await MarkerIcon.downloadResizePictureCircle(
             user.image ?? defaultIcon,
-            size: 120,
+            size: 130,
             addBorder: true,
             borderColor: Colors.blue,
             borderSize: 15,
@@ -165,7 +163,6 @@ class _HomepageState extends State<Homepage> {
     databaseQueries.getAllUsersExceptMe().then((userList) {
       updateMarkers(userList);
     });
-    mapViewModel = MapViewModel();
     checkLocationPermissions();
     super.initState();
   }
