@@ -5,10 +5,12 @@ import '../repo/database_queries.dart';
 
 class PostWidget extends StatelessWidget {
   final Post post;
+  final bool isProfile;
 
   const PostWidget({
     Key? key,
     required this.post,
+    required this.isProfile,
   }) : super(key: key);
 
   @override
@@ -47,13 +49,14 @@ class PostWidget extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: () {
-                  DatabaseQueries().deletePost(post.postId, post.date!);
-                },
-                icon: const Icon(Icons.delete),
-                color: Colors.red,
-              ),
+              if (isProfile)
+                IconButton(
+                  onPressed: () {
+                    DatabaseQueries().deletePost(post.postId, post.date!);
+                  },
+                  icon: const Icon(Icons.delete),
+                  color: Colors.red,
+                ),
             ],
           ),
           const SizedBox(height: 8.0),
@@ -62,12 +65,10 @@ class PostWidget extends StatelessWidget {
               color: Colors.grey,
               borderRadius: BorderRadius.circular(8.0),
             ),
-            child: Image.network(
-              post.imageUrl ?? defaultIcon,
-              fit: BoxFit.cover, // Adatta l'immagine al contenitore
-              width: double.infinity, // Occupa tutta la larghezza disponibile
-              height: 400.0
-            ),
+            child: Image.network(post.imageUrl ?? defaultIcon,
+                fit: BoxFit.cover, // Adatta l'immagine al contenitore
+                width: double.infinity, // Occupa tutta la larghezza disponibile
+                height: 400.0),
           ),
           const SizedBox(height: 8.0),
           Text(

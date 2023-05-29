@@ -43,7 +43,7 @@ class _FeedState extends State<Feed> {
         itemCount: _postList.length,
         itemBuilder: (context, index) {
           final post = _postList[index];
-          return PostWidget(post: post);
+          return PostWidget(post: post, isProfile: false);
         },
       ),
     );

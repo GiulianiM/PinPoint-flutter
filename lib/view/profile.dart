@@ -186,8 +186,9 @@ class _ProfileState extends State<Profile> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: posts.length,
               itemBuilder: (context, index) {
-                return PostWidget(post: posts[index]);
+                return PostWidget(post: posts[index], isProfile: true);
               },
+
             ),
           ],
         ),
