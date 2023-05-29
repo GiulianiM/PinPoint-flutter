@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pinpoint/model/post.dart';
 
+import '../repo/database_queries.dart';
+
 class PostWidget extends StatelessWidget {
   final Post post;
 
@@ -27,21 +29,30 @@ class PostWidget extends StatelessWidget {
                 radius: 20,
               ),
               const SizedBox(width: 8.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    post.username ?? 'Username',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.0,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      post.username ?? 'Username',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                      ),
                     ),
-                  ),
-                  Text(
-                    '${post.latitude} ${post.longitude}',
-                    style: const TextStyle(fontSize: 14.0),
-                  ),
-                ],
+                    Text(
+                      '${post.latitude} ${post.longitude}',
+                      style: const TextStyle(fontSize: 14.0),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  DatabaseQueries().deletePost(post.postId, post.date!);
+                },
+                icon: const Icon(Icons.delete),
+                color: Colors.red,
               ),
             ],
           ),

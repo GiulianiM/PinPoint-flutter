@@ -78,10 +78,18 @@ class _PostStateState extends State<_PostState> {
                   ),
                   const SizedBox(width: 16.0),
                   ElevatedButton(
-                    onPressed: () {
-                      viewModel.uploadPost(
-                        viewModel.imageProvider!,
-                        viewModel.descriptionController.text
+                    onPressed: () async {
+                      if (viewModel.imageProvider == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Seleziona un\'immagine'),
+                          ),
+                        );
+                        return;
+                      }
+                      await viewModel.uploadPost(
+                      viewModel.imageProvider!,
+                      viewModel.descriptionController.text
                       );
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) => const MyHomePage()),

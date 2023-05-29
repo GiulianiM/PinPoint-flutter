@@ -33,7 +33,10 @@ class _FeedState extends State<Feed> {
     return Scaffold(
       appBar: AppBar(
         title: const Center(
-          child: Text('Feed', style: TextStyle(fontWeight: FontWeight.bold)),
+          child: Text(
+            'Feed',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
       ),
       body: ListView.builder(

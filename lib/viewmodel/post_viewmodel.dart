@@ -19,8 +19,7 @@ class PostViewModel extends ChangeNotifier {
 
   PostViewModel() {
     _imagePicker = ImagePicker();
-    _imageProvider =
-        const AssetImage('assets/images/default.png');
+    _imageProvider = null;
   }
 
   ImageProvider<Object>? get imageProvider => _imageProvider;
@@ -35,7 +34,7 @@ class PostViewModel extends ChangeNotifier {
     }
   }
 
-  void uploadPost(
+  Future uploadPost(
       ImageProvider<Object> image,
       String description,
       ) async {
@@ -50,17 +49,14 @@ class PostViewModel extends ChangeNotifier {
       date: formattedDate,
     );
 
-    String imageUrl = await uploadImage(image, post.userId!);
+    String imageUrl = await uploadImage(image, post.userId!, formattedDate);
     post.imageUrl = imageUrl;
 
     await _databaseQueries.savePost(post);
   }
 
-  Future<String> uploadImage(ImageProvider<Object> image, String uid) async {
+  Future<String> uploadImage(ImageProvider<Object> image, String uid, String formattedDate) async {
     final storage = FirebaseStorage.instance;
-    DateTime now = DateTime.now();
-    String formattedDate = DateFormat('dd-MM-yyyy-hh-mm-ss').format(now);
-
     File imageFile = await convertImageToFile(image);
     String fileName = '$formattedDate.jpg';
     TaskSnapshot snapshot = await storage

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pinpoint/model/post.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pinpoint/model/utente.dart';
@@ -140,6 +141,8 @@ class DatabaseQueries {
           }
         });
 
+        postList.sort((a, b) => b.date!.compareTo(a.date!));
+
         completer.complete(postList);
       }
     });
@@ -161,26 +164,31 @@ class DatabaseQueries {
           if (idUtente == _auth.currentUser!.uid) {
             postMap.forEach((idPost, postData) {
               final post = Post(
-                  postId: idPost,
-                  userId: idUtente as String?,
-                  date: postData['date'] as String?,
-                  imageUrl: postData['imageUrl'] as String?,
-                  latitude: postData['latitude'] as String?,
-                  longitude: postData['longitude'] as String?,
-                  description: postData['description'] as String?,
-                  username: currentUser.username,
-                  userPic: currentUser.image);
+                postId: idPost,
+                userId: idUtente as String?,
+                date: postData['date'] as String?,
+                imageUrl: postData['imageUrl'] as String?,
+                latitude: postData['latitude'] as String?,
+                longitude: postData['longitude'] as String?,
+                description: postData['description'] as String?,
+                username: currentUser.username,
+                userPic: currentUser.image,
+              );
               postList.add(post);
             });
           }
         });
 
+        postList.sort((a, b) => b.date!.compareTo(a.date!));
+
         completer.complete(postList);
       }
     });
+
     final List<Post> postList = await completer.future;
     return postList;
   }
+
 
   Future<void> savePost(Post post) {
     final Completer<void> completer = Completer<void>();
@@ -238,6 +246,11 @@ class DatabaseQueries {
             (index) => availableChars[random.nextInt(availableChars.length)]).join();
 
     return randomString;
+  }
+
+  void deletePost(String? postId, String date) {
+    _postsRef.child(_auth.currentUser!.uid).child(postId!).remove();
+    FirebaseStorage.instance.ref().child('Post').child(_auth.currentUser!.uid).child('$date.jpg').delete();
   }
 
 }

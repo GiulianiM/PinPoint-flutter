@@ -73,8 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        selectedIconTheme: const IconThemeData(color: Colors.deepPurple),
-        unselectedIconTheme: const IconThemeData(color: Colors.grey),
+        selectedItemColor: Colors.deepPurple,
+        unselectedItemColor: Colors.grey,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.map),
