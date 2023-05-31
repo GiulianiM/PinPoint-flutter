@@ -22,8 +22,8 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   final Completer<GoogleMapController> _controller = Completer();
-  final defaultLatitude = "43.6168";
-  final defaultLongitude = "13.5189";
+  final defaultLatitude = "41.9027835";
+  final defaultLongitude = "12.4963655";
   LocationData? currentLocation;
   BitmapDescriptor pinLocationIcon = BitmapDescriptor.defaultMarker;
   Location location = Location();
@@ -46,7 +46,7 @@ class _HomepageState extends State<Homepage> {
           ),
           icon: await MarkerIcon.downloadResizePictureCircle(
             user.image ?? defaultIcon,
-            size: 130,
+            size: 150,
             addBorder: true,
             borderColor: Colors.blue,
             borderSize: 15,
@@ -118,8 +118,6 @@ class _HomepageState extends State<Homepage> {
       }
     });
 
-    GoogleMapController mapController = await _controller.future;
-
     locationSubscription = location.onLocationChanged.listen((newLocation) {
       if (mounted) {
         // Controlla se il widget è ancora montato
@@ -130,34 +128,7 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
-  /*void getCurrentLocation() async {
-    location.getLocation().then((that) {
-      setState(() {
-        currentLocation = that;
-      });
-    });
 
-    GoogleMapController mapController = await _controller.future;
-
-    location.onLocationChanged.listen((newLocation) {
-      //   mapController.animateCamera(
-      //     CameraUpdate.newCameraPosition(
-      //       CameraPosition(
-      //         target: LatLng(
-      //           newLocation.latitude!,
-      //           newLocation.longitude!,
-      //         ),
-      //         zoom: 18,
-      //       ),
-      //     ),
-      //   );
-
-      setState(() {
-        currentLocation = newLocation;
-      });
-    });
-  }
-*/
   @override
   void initState() {
     databaseQueries.getAllUsersExceptMe().then((userList) {

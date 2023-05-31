@@ -36,7 +36,7 @@ class PostWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      post.username ?? 'Username',
+                      post.username ?? '',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16.0,
@@ -72,11 +72,11 @@ class PostWidget extends StatelessWidget {
           ),
           const SizedBox(height: 8.0),
           Text(
-            post.description ?? 'Description',
+            post.description ?? '',
             style: const TextStyle(fontSize: 16.0),
           ),
           Text(
-            datePart ?? 'Data',
+            datePart,
             style: const TextStyle(fontSize: 16.0),
           ),
         ],

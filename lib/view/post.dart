@@ -1,7 +1,7 @@
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:pinpoint/main.dart';
-import 'package:pinpoint/view/homepage.dart';
 import 'package:pinpoint/viewmodel/post_viewmodel.dart';
 import 'package:provider/provider.dart';
 
@@ -18,12 +18,12 @@ class Post extends StatelessWidget {
 }
 
 class _PostState extends StatefulWidget {
-
   @override
   State<_PostState> createState() => _PostStateState();
 }
 
 class _PostStateState extends State<_PostState> {
+  File? _imageFile;
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +42,11 @@ class _PostStateState extends State<_PostState> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
-              child: Image(
-                image: viewModel.imageProvider ??
-                    const AssetImage('assets/images/default.png'),
-                fit: BoxFit.cover,
-              ),
+            FittedBox(
+              fit: BoxFit.fill,
+              child: _imageFile != null
+                  ? Image.file(_imageFile!)
+                  : Image.asset('assets/images/default.png'),
             ),
             Padding(
               padding:
@@ -73,13 +72,15 @@ class _PostStateState extends State<_PostState> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                    onPressed: viewModel.pickImageFromGallery,
+                    onPressed: () async {
+                      await selectImage(viewModel);
+                    },
                     child: const Text('Sfoglia'),
                   ),
                   const SizedBox(width: 16.0),
                   ElevatedButton(
                     onPressed: () async {
-                      if (viewModel.imageProvider == null) {
+                      if (_imageFile == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Seleziona un\'immagine'),
@@ -88,11 +89,10 @@ class _PostStateState extends State<_PostState> {
                         return;
                       }
                       await viewModel.uploadPost(
-                      viewModel.imageProvider!,
-                      viewModel.descriptionController.text
-                      );
+                          _imageFile!, viewModel.descriptionController.text);
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => const MyHomePage()),
+                        MaterialPageRoute(
+                            builder: (context) => const MyHomePage()),
                       );
                     },
                     child: const Text('Carica'),
@@ -104,5 +104,17 @@ class _PostStateState extends State<_PostState> {
         ),
       ),
     );
+  }
+
+  selectImage(PostViewModel viewModel) async {
+    final files = await viewModel.pickImage();
+    if (files != null) {
+      final cropperFile = await viewModel.crop(file: files);
+      if (cropperFile != null) {
+        setState(() {
+          _imageFile = File(cropperFile.path);
+        });
+      }
+    }
   }
 }

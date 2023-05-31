@@ -1,17 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:pinpoint/model/post.dart';
 import 'package:pinpoint/repo/database_queries.dart';
+import 'package:pinpoint/viewmodel/feed_viewmodel.dart';
 import 'package:pinpoint/widget/post_widget.dart';
+import 'package:provider/provider.dart';
 
-class Feed extends StatefulWidget {
+class Feed extends StatelessWidget {
   const Feed({Key? key}) : super(key: key);
 
   @override
-  _FeedState createState() => _FeedState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<FeedViewModel>(
+      create: (_) => FeedViewModel(),
+      child: Consumer<FeedViewModel>(
+        builder: (context, viewModel, _) {
+          return _FeedState(viewModel: viewModel);
+        },
+      ),
+    );
+  }
+}
+class _FeedState extends StatefulWidget {
+  final FeedViewModel viewModel;
+
+  const _FeedState({required this.viewModel});
+
+  @override
+  State<_FeedState> createState() => _FeedStateState();
 }
 
-class _FeedState extends State<Feed> {
-  List<Post> _postList = [];
+class _FeedStateState extends State<_FeedState> {
+  late List<Post> _postList = [];
 
   @override
   void initState() {
@@ -19,13 +38,16 @@ class _FeedState extends State<Feed> {
     _fetchPosts();
   }
 
-  void _fetchPosts() async {
-    final posts = await DatabaseQueries()
-        .getAllUsersExceptMe()
-        .then((utenti) => DatabaseQueries().getAllPostsExceptMine(utenti));
-    setState(() {
-      _postList = posts;
-    });
+  Future<void> _fetchPosts() async {
+    try {
+      final posts = await widget.viewModel.fetchPosts();
+      setState(() {
+        _postList = posts;
+      });
+    } catch (error) {
+      // Gestione dell'errore
+      print('Errore durante il recupero dei post: $error');
+    }
   }
 
   @override
