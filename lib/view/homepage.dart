@@ -119,6 +119,7 @@ class _HomepageState extends State<Homepage> {
     });
 
     locationSubscription = location.onLocationChanged.listen((newLocation) {
+      databaseQueries.setNewLocation(newLocation);
       if (mounted) {
         // Controlla se il widget è ancora montato
         setState(() {

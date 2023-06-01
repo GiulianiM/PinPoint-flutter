@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:location_platform_interface/location_platform_interface.dart';
 import 'package:pinpoint/model/post.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pinpoint/model/utente.dart';
@@ -251,6 +252,13 @@ class DatabaseQueries {
   void deletePost(String? postId, String date) {
     _postsRef.child(_auth.currentUser!.uid).child(postId!).remove();
     FirebaseStorage.instance.ref().child('Post').child(_auth.currentUser!.uid).child('$date.jpg').delete();
+  }
+
+  void setNewLocation(LocationData newLocation) {
+    _usersRef.child(_auth.currentUser!.uid).update({
+      'latitude': newLocation.latitude.toString(),
+      'longitude': newLocation.longitude.toString(),
+    });
   }
 
 }
