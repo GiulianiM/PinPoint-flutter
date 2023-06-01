@@ -61,7 +61,7 @@ class PostViewModel extends ChangeNotifier {
   ) async {
     currentLocation = await location.getLocation();
     DateTime now = DateTime.now();
-    String formattedDate = DateFormat('dd-MM-yyyy-hh-mm-ss').format(now);
+    String formattedDate = DateFormat('yyyy-MM-dd-hh-mm-ss').format(now);
     Post post = Post(
       userId: await _databaseQueries.getCurrentUserUid(),
       description: description,

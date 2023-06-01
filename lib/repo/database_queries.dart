@@ -150,7 +150,7 @@ class DatabaseQueries {
     return postList;
   }
 
-  Future<List<Post>> getAllMinePosts() async {
+  Future<List<Post>> getAllMyPosts() async {
     final currentUser = await getCurrentUserInfo();
     final completer = Completer<List<Post>>();
 
