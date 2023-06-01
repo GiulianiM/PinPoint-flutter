@@ -23,32 +23,53 @@ class _ProfileState extends State<Profile> {
 
   @override
   void initState() {
-    databaseQueries.getCurrentUserInfo().then((thatUser) {
-      setState(() {
-        utente = thatUser;
-      });
+    super.initState();
+    _fetchData();
+  }
 
-      databaseQueries.getAllMinePosts().then((thosePosts) {
+  void _fetchData() async {
+    try {
+      final thatUser = await databaseQueries.getCurrentUserInfo();
+      if (mounted) {
+        setState(() {
+          utente = thatUser;
+        });
+      }
+
+      final thosePosts = await databaseQueries.getAllMyPosts();
+      if (mounted) {
         setState(() {
           posts = thosePosts;
         });
-      });
-    });
+      }
 
-    databaseQueries.getFollowerCount().then((thatNuber) => setState(() {
-      followerCount = thatNuber;
-    }));
+      final thatFollowerCount = await databaseQueries.getFollowerCount();
+      if (mounted) {
+        setState(() {
+          followerCount = thatFollowerCount;
+        });
+      }
 
-    databaseQueries.getFollowingCount().then((thatNuber) => setState(() {
-      followingCount = thatNuber;
-    }));
+      final thatFollowingCount = await databaseQueries.getFollowingCount();
+      if (mounted) {
+        setState(() {
+          followingCount = thatFollowingCount;
+        });
+      }
 
-    databaseQueries.getPostCount().then((thatNuber) => setState(() {
-      postCount = thatNuber;
-    }));
-
-    super.initState();
+      final thatPostCount = await databaseQueries.getPostCount();
+      if (mounted) {
+        setState(() {
+          postCount = thatPostCount;
+        });
+      }
+    } catch (error) {
+      // Gestione dell'errore
+      print('Errore durante il recupero dei dati: $error');
+    }
   }
+
+
 
   @override
   Widget build(BuildContext context) {

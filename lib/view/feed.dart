@@ -41,9 +41,11 @@ class _FeedStateState extends State<_FeedState> {
   Future<void> _fetchPosts() async {
     try {
       final posts = await widget.viewModel.fetchPosts();
-      setState(() {
-        _postList = posts;
-      });
+      if (mounted) {
+        setState(() {
+          _postList = posts;
+        });
+      }
     } catch (error) {
       // Gestione dell'errore
       print('Errore durante il recupero dei post: $error');
