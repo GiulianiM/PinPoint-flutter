@@ -38,69 +38,71 @@ class _PostStateState extends State<_PostState> {
           ),
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FittedBox(
-              fit: BoxFit.fill,
-              child: _imageFile != null
-                  ? Image.file(_imageFile!)
-                  : Image.asset('assets/images/default.png'),
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
-              child: TextFormField(
-                controller: viewModel.descriptionController,
-                decoration: InputDecoration(
-                  hintText: 'Inserisci una descrizione',
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      viewModel.descriptionController.clear();
-                    },
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FittedBox(
+                fit: BoxFit.fill,
+                child: _imageFile != null
+                    ? Image.file(_imageFile!)
+                    : Image.asset('assets/images/default.png'),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
+                child: TextFormField(
+                  controller: viewModel.descriptionController,
+                  decoration: InputDecoration(
+                    hintText: 'Inserisci una descrizione',
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        viewModel.descriptionController.clear();
+                      },
+                    ),
                   ),
+                  maxLines: 2,
                 ),
-                maxLines: 2,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      await selectImage(viewModel);
-                    },
-                    child: const Text('Sfoglia'),
-                  ),
-                  const SizedBox(width: 16.0),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (_imageFile == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Seleziona un\'immagine'),
-                          ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        await selectImage(viewModel);
+                      },
+                      child: const Text('Sfoglia'),
+                    ),
+                    const SizedBox(width: 16.0),
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (_imageFile == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Seleziona un\'immagine'),
+                            ),
+                          );
+                          return;
+                        }
+                        await viewModel.uploadPost(
+                            _imageFile!, viewModel.descriptionController.text);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => const MyHomePage()),
                         );
-                        return;
-                      }
-                      await viewModel.uploadPost(
-                          _imageFile!, viewModel.descriptionController.text);
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => const MyHomePage()),
-                      );
-                    },
-                    child: const Text('Carica'),
-                  ),
-                ],
+                      },
+                      child: const Text('Carica'),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
