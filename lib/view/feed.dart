@@ -22,7 +22,6 @@ class Feed extends StatelessWidget {
 }
 class _FeedState extends StatefulWidget {
   final FeedViewModel viewModel;
-
   const _FeedState({required this.viewModel});
 
   @override
@@ -47,8 +46,11 @@ class _FeedStateState extends State<_FeedState> {
         });
       }
     } catch (error) {
-      // Gestione dell'errore
-      print('Errore durante il recupero dei post: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString()),
+        ),
+      );
     }
   }
 

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pinpoint/model/utente.dart';
-import 'package:pinpoint/repo/database_queries.dart';
-import 'package:pinpoint/model/post.dart';
 import 'package:pinpoint/widget/post_widget.dart';
+
+import '../viewmodel/profile_viewmodel.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -12,64 +11,14 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  DatabaseQueries databaseQueries = DatabaseQueries();
-  int followerCount = 0;
-  int followingCount = 0;
-  int postCount = 0;
-  Utente utente = Utente();
-  List<Post> posts = <Post>[];
-  final String defaultIcon =
-      'https://firebasestorage.googleapis.com/v0/b/pinpointmvvm.appspot.com/o/Default%20Images%2FProfilePicture.png?alt=media&token=780391e3-37ee-4352-8367-f4c08b0f809d';
+  late ProfileViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
+    _viewModel = ProfileViewModel();
+    _viewModel.fetchData();
   }
-
-  void _fetchData() async {
-    try {
-      final thatUser = await databaseQueries.getCurrentUserInfo();
-      if (mounted) {
-        setState(() {
-          utente = thatUser;
-        });
-      }
-
-      final thosePosts = await databaseQueries.getAllMyPosts();
-      if (mounted) {
-        setState(() {
-          posts = thosePosts;
-        });
-      }
-
-      final thatFollowerCount = await databaseQueries.getFollowerCount();
-      if (mounted) {
-        setState(() {
-          followerCount = thatFollowerCount;
-        });
-      }
-
-      final thatFollowingCount = await databaseQueries.getFollowingCount();
-      if (mounted) {
-        setState(() {
-          followingCount = thatFollowingCount;
-        });
-      }
-
-      final thatPostCount = await databaseQueries.getPostCount();
-      if (mounted) {
-        setState(() {
-          postCount = thatPostCount;
-        });
-      }
-    } catch (error) {
-      // Gestione dell'errore
-      print('Errore durante il recupero dei dati: $error');
-    }
-  }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +27,7 @@ class _ProfileState extends State<Profile> {
         title: Row(
           children: [
             Text(
-              utente.username ?? 'Username',
+              _viewModel.utente.username ?? 'Username',
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -104,7 +53,8 @@ class _ProfileState extends State<Profile> {
                 children: [
                   CircleAvatar(
                     // Immagine del profilo
-                    backgroundImage: NetworkImage(utente.image ?? defaultIcon),
+                    backgroundImage:
+                    NetworkImage(_viewModel.utente.image ?? _viewModel.defaultIcon),
                     radius: 50,
                   ),
                   const SizedBox(width: 50),
@@ -118,7 +68,7 @@ class _ProfileState extends State<Profile> {
                             Column(
                               children: [
                                 Text(
-                                  postCount.toString(),
+                                  _viewModel.postCount.toString(),
                                   style: const TextStyle(
                                     fontSize: 14,
                                   ),
@@ -136,7 +86,7 @@ class _ProfileState extends State<Profile> {
                             Column(
                               children: [
                                 Text(
-                                  followerCount.toString(),
+                                  _viewModel.followerCount.toString(),
                                   style: const TextStyle(
                                     fontSize: 14,
                                   ),
@@ -154,7 +104,7 @@ class _ProfileState extends State<Profile> {
                             Column(
                               children: [
                                 Text(
-                                  followingCount.toString(),
+                                  _viewModel.followingCount.toString(),
                                   style: const TextStyle(
                                     fontSize: 14,
                                   ),
@@ -187,7 +137,7 @@ class _ProfileState extends State<Profile> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                utente.fullname ?? 'Nome Cognome',
+                _viewModel.utente.fullname ?? 'Nome Cognome',
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
@@ -195,7 +145,7 @@ class _ProfileState extends State<Profile> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                utente.bio ?? 'Bio',
+                _viewModel.utente.bio ?? 'Bio',
                 style: const TextStyle(
                   fontSize: 16,
                 ),
@@ -205,11 +155,10 @@ class _ProfileState extends State<Profile> {
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: posts.length,
+              itemCount: _viewModel.posts.length,
               itemBuilder: (context, index) {
-                return PostWidget(post: posts[index], isProfile: true);
+                return PostWidget(post: _viewModel.posts[index], isProfile: true);
               },
-
             ),
           ],
         ),

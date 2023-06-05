@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:pinpoint/main.dart';
+import 'package:pinpoint/view/bottom_navigation.dart';
 import 'package:pinpoint/viewmodel/post_viewmodel.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +25,7 @@ class _PostState extends StatefulWidget {
 
 class _PostStateState extends State<_PostState> {
   File? _imageFile;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +53,7 @@ class _PostStateState extends State<_PostState> {
               ),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
+                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
                 child: TextFormField(
                   controller: viewModel.descriptionController,
                   decoration: InputDecoration(
@@ -80,7 +82,7 @@ class _PostStateState extends State<_PostState> {
                     ),
                     const SizedBox(width: 16.0),
                     ElevatedButton(
-                      onPressed: () async {
+                      onPressed: isLoading ? null : () async {
                         if (_imageFile == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -89,14 +91,37 @@ class _PostStateState extends State<_PostState> {
                           );
                           return;
                         }
-                        await viewModel.uploadPost(
-                            _imageFile!, viewModel.descriptionController.text);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (context) => const MyHomePage()),
-                        );
+
+                        setState(() {
+                          isLoading = true;
+                        });
+
+                        try {
+                          await viewModel.uploadPost(
+                            _imageFile!,
+                            viewModel.descriptionController.text,
+                          );
+
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const BottomNavigation(),
+                            ),
+                          );
+                        } catch (error) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Errore durante il caricamento del post'),
+                            ),
+                          );
+                        } finally {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
                       },
-                      child: const Text('Carica'),
+                      child: isLoading
+                          ? const CircularProgressIndicator() // Mostra la ProgressBar
+                          : const Text('Carica'), // Mostra il testo "Carica"
                     ),
                   ],
                 ),

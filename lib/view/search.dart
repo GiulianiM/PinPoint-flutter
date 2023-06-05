@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../model/utente.dart';
-import '../viewmodel/serch_viewmodel.dart';
+import '../viewmodel/search_viewmodel.dart';
 import '../widget/search_box.dart';
 import '../widget/search_result_item.dart';
 
