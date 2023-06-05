@@ -12,6 +12,7 @@ import 'package:pinpoint/repo/database_queries.dart';
 
 import '../model/utente.dart';
 
+/// Classe che mostra la pagina Home
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
 

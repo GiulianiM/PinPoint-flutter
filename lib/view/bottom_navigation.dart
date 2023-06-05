@@ -8,7 +8,7 @@ import '../viewmodel/bottom_navigation_viewmodel.dart';
 import 'feed.dart';
 import 'homepage.dart';
 
-
+/// Classe che mostra la bottom navigation bar per navigare tra le varie pagine dell'applicazione
 class BottomNavigation extends StatefulWidget {
   const BottomNavigation({Key? key}) : super(key: key);
 

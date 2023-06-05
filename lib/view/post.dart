@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:pinpoint/main.dart';
 import 'package:pinpoint/view/bottom_navigation.dart';
 import 'package:pinpoint/viewmodel/post_viewmodel.dart';
 import 'package:provider/provider.dart';
 
+/// Classe che mostra la pagina di Aggiungi Post
 class Post extends StatelessWidget {
   const Post({Key? key}) : super(key: key);
 
@@ -133,6 +133,8 @@ class _PostStateState extends State<_PostState> {
     );
   }
 
+  /// Metodo che permette di selezionare un'immagine dalla galleria.
+  /// [viewModel] ViewModel che gestisce la pagina
   selectImage(PostViewModel viewModel) async {
     final files = await viewModel.pickImage();
     if (files != null) {

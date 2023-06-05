@@ -3,6 +3,7 @@ import 'package:pinpoint/widget/post_widget.dart';
 
 import '../viewmodel/profile_viewmodel.dart';
 
+/// Classe che mostra la pagina del profilo
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
 

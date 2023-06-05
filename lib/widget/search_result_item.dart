@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pinpoint/model/utente.dart';
 
+/// Widget che rappresenta un utente nella pagina di ricerca
 class SearchResultItem extends StatelessWidget {
   final Utente user;
 

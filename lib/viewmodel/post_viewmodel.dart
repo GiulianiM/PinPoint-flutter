@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import '../model/post.dart';
 import '../repo/database_queries.dart';
 
+/// ViewModel che gestisce la pagina Aggiungi Post
 class PostViewModel extends ChangeNotifier {
   final TextEditingController _descriptionController = TextEditingController();
   final DatabaseQueries _databaseQueries = DatabaseQueries();
@@ -19,6 +20,7 @@ class PostViewModel extends ChangeNotifier {
 
   TextEditingController get descriptionController => _descriptionController;
 
+  /// Costruttore
   PostViewModel({
     ImagePicker? imagePicker,
     ImageCropper? imageCropper,
@@ -27,6 +29,9 @@ class PostViewModel extends ChangeNotifier {
   final ImagePicker _imagePicker;
   final ImageCropper _imageCropper;
 
+  /// Metodo che permette di ottenere l'immagine dalla galleria.
+  /// [source] Sorgente dell'immagine.
+  /// [imageQuality] Qualità dell'immagine.
   Future<XFile?> pickImage({
     ImageSource source = ImageSource.gallery,
     int imageQuality = 50,
@@ -40,6 +45,8 @@ class PostViewModel extends ChangeNotifier {
     return null;
   }
 
+  /// Metodo che permette di ritagliare l'immagine.
+  /// [file] Immagine da ritagliare.
   Future<CroppedFile?> crop({
     required XFile file,
   }) async =>
@@ -55,6 +62,9 @@ class PostViewModel extends ChangeNotifier {
         ],
       );
 
+  /// Metodo che permette di caricare il post sul database.
+  /// [image] Immagine da caricare.
+  /// [description] Descrizione del post.
   Future uploadPost(
     File image,
     String description,
@@ -76,6 +86,10 @@ class PostViewModel extends ChangeNotifier {
     await _databaseQueries.savePost(post);
   }
 
+  /// Metodo che permette di caricare l'immagine presa dalla galleria.
+  /// [image] Immagine da caricare.
+  /// [uid] Id dell'utente presa dal post.
+  /// [formattedDate] Data formattata.
   Future<String> uploadImage(
       File image, String uid, String formattedDate) async {
     final storage = FirebaseStorage.instance;
@@ -88,6 +102,8 @@ class PostViewModel extends ChangeNotifier {
     return imageUrl;
   }
 
+  /// Metodo che permette di convertire l'immagine in un file.
+  /// [image] Immagine da convertire.
   Future<File> convertImageToFile(File image) async {
     Directory tempDir = await getTemporaryDirectory();
     String tempPath = tempDir.path;

@@ -3,6 +3,7 @@ import 'package:pinpoint/model/utente.dart';
 import 'package:pinpoint/repo/database_queries.dart';
 import 'package:pinpoint/model/post.dart';
 
+/// ViewModel che gestisce la pagina Profilo
 class ProfileViewModel extends ChangeNotifier {
   DatabaseQueries databaseQueries = DatabaseQueries();
   int followerCount = 0;
@@ -13,6 +14,7 @@ class ProfileViewModel extends ChangeNotifier {
   final String defaultIcon =
       'https://firebasestorage.googleapis.com/v0/b/pinpointmvvm.appspot.com/o/Default%20Images%2FProfilePicture.png?alt=media&token=780391e3-37ee-4352-8367-f4c08b0f809d';
 
+  /// Metodo che permette di ottenere tutti i dati dell'utente
   void fetchData() async {
     try {
       final thatUser = await databaseQueries.getCurrentUserInfo();
@@ -32,7 +34,6 @@ class ProfileViewModel extends ChangeNotifier {
 
       notifyListeners();
     } catch (error) {
-      // Gestione dell'errore
       print('Errore durante il recupero dei dati: $error');
     }
   }

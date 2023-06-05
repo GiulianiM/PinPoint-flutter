@@ -3,6 +3,8 @@ import 'package:pinpoint/model/post.dart';
 
 import '../repo/database_queries.dart';
 
+
+/// Widget che gestisce la visualizzazione di un post
 class PostWidget extends StatelessWidget {
   final Post post;
   final bool isProfile;

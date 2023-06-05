@@ -5,6 +5,7 @@ import '../viewmodel/search_viewmodel.dart';
 import '../widget/search_box.dart';
 import '../widget/search_result_item.dart';
 
+/// Classe che mostra la pagina di ricerca
 class Search extends StatefulWidget {
   const Search({Key? key}) : super(key: key);
 

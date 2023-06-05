@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pinpoint/model/post.dart';
-import 'package:pinpoint/repo/database_queries.dart';
 import 'package:pinpoint/viewmodel/feed_viewmodel.dart';
 import 'package:pinpoint/widget/post_widget.dart';
 import 'package:provider/provider.dart';
 
+/// Classe che mostra la pagina Feed
 class Feed extends StatelessWidget {
   const Feed({Key? key}) : super(key: key);
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Widget che mostra la barra di ricerca
 class SearchBox extends StatefulWidget {
   final ValueChanged<String> onTextChanged;
   final VoidCallback onSearchCancelled;

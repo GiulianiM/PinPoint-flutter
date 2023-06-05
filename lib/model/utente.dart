@@ -1,3 +1,5 @@
+/// Modello per la gestione degli utenti
+
 class Utente {
   String? bio;
   String? email;

@@ -1,3 +1,5 @@
+/// Model calss per il post
+
 class Post {
   String? postId;
   String? userId;
@@ -21,6 +23,7 @@ class Post {
     this.userPic
   });
 
+  /// Metodo per convertire un oggetto di tipo Post in un oggetto di tipo Map
   Map<String, dynamic> toMap() {
     return {
       'postId': postId,

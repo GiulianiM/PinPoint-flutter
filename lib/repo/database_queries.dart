@@ -7,6 +7,7 @@ import 'package:pinpoint/model/post.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pinpoint/model/utente.dart';
 
+/// Classe che contiene tutti i metodi per effettuare le query al database
 class DatabaseQueries {
   final DatabaseReference _followsRef =
       FirebaseDatabase.instance.ref().child('follows');
@@ -18,6 +19,7 @@ class DatabaseQueries {
   final email = "prova@prova.com";
   final password = "prova123";
 
+  /// Metodo che permette di registrare un utente nel database
   Future<bool> loginWithEmail() async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -30,12 +32,22 @@ class DatabaseQueries {
     }
   }
 
+  /// Metodo che ritorna l'id dell'utente corrente
   Future<String> getCurrentUserUid() async {
     final completer = Completer<String>();
     completer.complete(_auth.currentUser!.uid);
     return completer.future;
   }
 
+  /// Metodo che ritorna le informazioni correnti dell'utente quali:
+  /// + username
+  /// + fullname
+  /// + image
+  /// + bio
+  /// + email
+  /// + latitude
+  /// + longitude
+  /// + uid
   Future<Utente> getCurrentUserInfo() {
     final completer = Completer<Utente>();
 
@@ -59,6 +71,7 @@ class DatabaseQueries {
     return completer.future;
   }
 
+  /// Metodo che ritorna le informazioni di un utente dato il suo username
   Future<List<Utente>> getAllUsersExceptMeThatMatch(String username) {
     final completer = Completer<List<Utente>>();
 
@@ -87,6 +100,7 @@ class DatabaseQueries {
     return completer.future;
   }
 
+  /// Metodo che ritorna tutti gli utenti tranne l'utente corrente
   Future<List<Utente>> getAllUsersExceptMe() {
     final completer = Completer<List<Utente>>();
 
@@ -113,6 +127,7 @@ class DatabaseQueries {
     return completer.future;
   }
 
+  /// Metodo che ritorna tutti i post degli utenti
   Future<List<Post>> getAllPostsExceptMine(List<Utente> utenti) async {
     final completer = Completer<List<Post>>();
 
@@ -151,6 +166,7 @@ class DatabaseQueries {
     return postList;
   }
 
+  /// Metodo che ritorna tutti i post dell'utente corrente
   Future<List<Post>> getAllMyPosts() async {
     final currentUser = await getCurrentUserInfo();
     final completer = Completer<List<Post>>();
@@ -190,7 +206,9 @@ class DatabaseQueries {
     return postList;
   }
 
-
+  /// Metodo che salva un post sul database.
+  /// [post] è il post da salvare.
+  /// Ritorna un Future<void> che indica se l'operazione è andata a buon fine.
   Future<void> savePost(Post post) {
     final Completer<void> completer = Completer<void>();
 
@@ -203,6 +221,8 @@ class DatabaseQueries {
     return completer.future;
   }
 
+  /// Metodo che ritorna il numero di follower dell'utente corrente.
+  /// Ritorna il numero di follower.
   Future<int> getFollowerCount() async {
     DataSnapshot snapshot = await _followsRef
         .child(_auth.currentUser!.uid)
@@ -216,6 +236,8 @@ class DatabaseQueries {
     return 0;
   }
 
+  /// Metodo che ritorna il numero di following dell'utente corrente.
+  /// Ritorna il numero di following
   Future<int> getFollowingCount() async {
     DataSnapshot snapshot = await _followsRef
         .child(_auth.currentUser!.uid)
@@ -229,6 +251,8 @@ class DatabaseQueries {
     return 0;
   }
 
+  /// Metodo che ritorna il numero di post dell'utente corrente.
+  /// Ritorna il numero di post
   Future<int> getPostCount() async {
     DataSnapshot snapshot = await _postsRef.child(_auth.currentUser!.uid).get();
     if (snapshot.value != null && snapshot.value is Map) {
@@ -239,6 +263,9 @@ class DatabaseQueries {
     return 0;
   }
 
+  /// Metodo che genera una stringa random.
+  /// [length] lunghezza della stringa.
+  /// Ritorna la stringa generata
   String getRandomString(int length) {
     final random = Random();
     const availableChars =
@@ -249,11 +276,13 @@ class DatabaseQueries {
     return randomString;
   }
 
+  /// Metodo che elimina un post dal database
   void deletePost(String? postId, String date) {
     _postsRef.child(_auth.currentUser!.uid).child(postId!).remove();
     FirebaseStorage.instance.ref().child('Post').child(_auth.currentUser!.uid).child('$date.jpg').delete();
   }
 
+  /// Metodo che imposta la posizione dell'utente corrente sul database
   void setNewLocation(LocationData newLocation) {
     _usersRef.child(_auth.currentUser!.uid).update({
       'latitude': newLocation.latitude.toString(),
