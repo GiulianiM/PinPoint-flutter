@@ -1,40 +1,63 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:pinpoint/model/post.dart';
 import 'package:pinpoint/model/utente.dart';
 import 'package:pinpoint/repo/database_queries.dart';
-import 'package:pinpoint/model/post.dart';
+import 'package:rxdart/rxdart.dart';
 
-/// ViewModel che gestisce la pagina Profilo
-class ProfileViewModel extends ChangeNotifier {
-  DatabaseQueries databaseQueries = DatabaseQueries();
-  int followerCount = 0;
-  int followingCount = 0;
-  int postCount = 0;
-  Utente utente = Utente();
-  List<Post> posts = <Post>[];
-  final String defaultIcon =
-      'https://firebasestorage.googleapis.com/v0/b/pinpointmvvm.appspot.com/o/Default%20Images%2FProfilePicture.png?alt=media&token=780391e3-37ee-4352-8367-f4c08b0f809d';
+class ProfileViewModel {
+  final DatabaseQueries _databaseQueries = DatabaseQueries();
 
-  /// Metodo che permette di ottenere tutti i dati dell'utente
+  final BehaviorSubject<Utente> _utenteController = BehaviorSubject<Utente>();
+  final StreamController<List<Post>> _postsController = StreamController<List<Post>>();
+  final StreamController<int> _followerCountController = StreamController<int>();
+  final StreamController<int> _followingCountController = StreamController<int>();
+  final StreamController<int> _postCountController = StreamController<int>();
+
+  Stream<Utente> get utenteStream => _utenteController.stream;
+  Stream<List<Post>> get postsStream => _postsController.stream;
+  Stream<int> get followerCountStream => _followerCountController.stream;
+  Stream<int> get followingCountStream => _followingCountController.stream;
+  Stream<int> get postCountStream => _postCountController.stream;
+
   void fetchData() async {
     try {
-      final thatUser = await databaseQueries.getCurrentUserInfo();
-      utente = thatUser;
+      final thatUser = await _databaseQueries.getCurrentUserInfoStream();
+      thatUser.listen((user) {
+        _utenteController.add(user);
+        print('Utente: ${user.username}');
+      });
 
-      final thosePosts = await databaseQueries.getAllMyPosts();
-      posts = thosePosts;
 
-      final thatFollowerCount = await databaseQueries.getFollowerCount();
-      followerCount = thatFollowerCount;
+      final thosePostsStream = await _databaseQueries.getAllMyPostsStream();
+      thosePostsStream.listen((posts) {
+        _postsController.add(posts);
+      });
 
-      final thatFollowingCount = await databaseQueries.getFollowingCount();
-      followingCount = thatFollowingCount;
+      final thatFollowerCountStream = await _databaseQueries.getFollowerCountStream();
+      thatFollowerCountStream.listen((count) {
+        _followerCountController.add(count);
+      });
 
-      final thatPostCount = await databaseQueries.getPostCount();
-      postCount = thatPostCount;
+      final thatFollowingCountStream = await _databaseQueries.getFollowingCountStream();
+      thatFollowingCountStream.listen((count) {
+        _followingCountController.add(count);
+      });
 
-      notifyListeners();
+      final thatPostCountStream = await _databaseQueries.getPostCountStream();
+      thatPostCountStream.listen((count) {
+        _postCountController.add(count);
+      });
+
     } catch (error) {
       print('Errore durante il recupero dei dati: $error');
     }
+  }
+
+  void dispose() {
+    _utenteController.close();
+    _postsController.close();
+    _followerCountController.close();
+    _followingCountController.close();
+    _postCountController.close();
   }
 }
