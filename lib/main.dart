@@ -9,12 +9,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  DatabaseQueries().loginWithEmail();
-  runApp(const MyApp());
+  await DatabaseQueries().loginWithEmail();
+  runApp(const PinPoint());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class PinPoint extends StatelessWidget {
+  const PinPoint({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

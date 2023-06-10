@@ -4,13 +4,23 @@ import '../model/post.dart';
 import '../repo/database_queries.dart';
 
 /// ViewModel che gestisce la pagina Feed
-class FeedViewModel extends ChangeNotifier{
+class FeedViewModel extends ChangeNotifier {
+  final DatabaseQueries _databaseQueries = DatabaseQueries();
+  late Stream<List<Post>> _postsStream;
 
-  /// Metodo che permette di ottenere tutti i post
-  Future<List<Post>> fetchPosts() async {
-    final utenti = await DatabaseQueries().getAllUsersExceptMe();
-    final posts = await DatabaseQueries().getAllPostsExceptMine(utenti);
-    return posts;
+  Stream<List<Post>> get postsStream => _postsStream;
+
+  FeedViewModel() {
+    _fetchPosts();
   }
 
+  void _fetchPosts() {
+    final utentiStream = _databaseQueries.getAllUsersExceptMeStream();
+    _postsStream = utentiStream.asyncExpand((utenti) {
+      return _databaseQueries.getAllPostsExceptMineStream(utenti);
+    });
+    notifyListeners();
+  }
 }
+
+

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pinpoint/widget/post_widget.dart';
 
+import '../model/post.dart';
+import '../model/utente.dart';
+import '../utils/constants.dart';
 import '../viewmodel/profile_viewmodel.dart';
 
-/// Classe che mostra la pagina del profilo
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
 
@@ -22,17 +24,35 @@ class _ProfileState extends State<Profile> {
   }
 
   @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            Text(
-              _viewModel.utente.username ?? 'Username',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+            StreamBuilder<Utente>(
+              stream: _viewModel.utenteStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final utente = snapshot.data!;
+                  return Text(
+                    utente.username!,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              },
             ),
             const Spacer(),
             IconButton(
@@ -52,11 +72,22 @@ class _ProfileState extends State<Profile> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    // Immagine del profilo
-                    backgroundImage:
-                    NetworkImage(_viewModel.utente.image ?? _viewModel.defaultIcon),
-                    radius: 50,
+                  StreamBuilder<String>(
+                    stream: _viewModel.utenteStream.map((utente) => utente.image ?? Constants.defaultIcon),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        final image = snapshot.data!;
+                        return CircleAvatar(
+                          backgroundImage: NetworkImage(image),
+                          radius: 50,
+                        );
+                      } else {
+                        return CircleAvatar(
+                          backgroundImage: NetworkImage(Constants.defaultIcon),
+                          radius: 50,
+                        );
+                      }
+                    },
                   ),
                   const SizedBox(width: 50),
                   Padding(
@@ -68,11 +99,23 @@ class _ProfileState extends State<Profile> {
                           children: [
                             Column(
                               children: [
-                                Text(
-                                  _viewModel.postCount.toString(),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                  ),
+                                StreamBuilder<int>(
+                                  stream: _viewModel.postCountStream,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      final count = snapshot.data!;
+                                      return Text(
+                                        count.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Text('Error: ${snapshot.error}');
+                                    } else {
+                                      return const CircularProgressIndicator();
+                                    }
+                                  },
                                 ),
                                 const SizedBox(height: 4),
                                 const Text(
@@ -86,11 +129,23 @@ class _ProfileState extends State<Profile> {
                             const SizedBox(width: 16),
                             Column(
                               children: [
-                                Text(
-                                  _viewModel.followerCount.toString(),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                  ),
+                                StreamBuilder<int>(
+                                  stream: _viewModel.followerCountStream,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      final count = snapshot.data!;
+                                      return Text(
+                                        count.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Text('Error: ${snapshot.error}');
+                                    } else {
+                                      return const CircularProgressIndicator();
+                                    }
+                                  },
                                 ),
                                 const SizedBox(height: 4),
                                 const Text(
@@ -104,11 +159,23 @@ class _ProfileState extends State<Profile> {
                             const SizedBox(width: 16),
                             Column(
                               children: [
-                                Text(
-                                  _viewModel.followingCount.toString(),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                  ),
+                                StreamBuilder<int>(
+                                  stream: _viewModel.followingCountStream,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      final count = snapshot.data!;
+                                      return Text(
+                                        count.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Text('Error: ${snapshot.error}');
+                                    } else {
+                                      return const CircularProgressIndicator();
+                                    }
+                                  },
                                 ),
                                 const SizedBox(height: 4),
                                 const Text(
@@ -137,28 +204,60 @@ class _ProfileState extends State<Profile> {
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                _viewModel.utente.fullname ?? 'Nome Cognome',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              child: StreamBuilder<Utente>(
+                stream: _viewModel.utenteStream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final utente = snapshot.data!;
+                    return Text(
+                      utente.fullname ?? 'Nome Cognome',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    );
+                  } else {
+                    return const SizedBox();
+                  }
+                },
               ),
             ),
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                _viewModel.utente.bio ?? 'Bio',
-                style: const TextStyle(
-                  fontSize: 16,
-                ),
+              child: StreamBuilder<Utente>(
+                stream: _viewModel.utenteStream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final utente = snapshot.data!;
+                    return Text(
+                      utente.bio ?? 'Bio',
+                      style: const TextStyle(
+                        fontSize: 16,
+                      ),
+                    );
+                  } else {
+                    return const SizedBox();
+                  }
+                },
               ),
             ),
             const SizedBox(height: 16),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _viewModel.posts.length,
-              itemBuilder: (context, index) {
-                return PostWidget(post: _viewModel.posts[index], isProfile: true);
+            StreamBuilder<List<Post>>(
+              stream: _viewModel.postsStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final posts = snapshot.data!;
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: posts.length,
+                    itemBuilder: (context, index) {
+                      return PostWidget(post: posts[index], isProfile: true);
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return const CircularProgressIndicator();
+                }
               },
             ),
           ],

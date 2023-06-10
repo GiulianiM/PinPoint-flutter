@@ -20,12 +20,6 @@ class _SearchBoxState extends State<SearchBox> {
   bool _hasFocus = false;
 
   @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -70,5 +64,11 @@ class _SearchBoxState extends State<SearchBox> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 }

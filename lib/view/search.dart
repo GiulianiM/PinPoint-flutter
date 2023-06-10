@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pinpoint/utils/constants.dart';
 
 import '../model/utente.dart';
 import '../viewmodel/search_viewmodel.dart';
@@ -14,18 +15,14 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
-  final SearchViewModel _viewModel = SearchViewModel();
+  late SearchViewModel _viewModel;
 
   @override
   void initState() {
+    _viewModel = SearchViewModel();
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _viewModel.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +30,7 @@ class _SearchState extends State<Search> {
       appBar: AppBar(
         title: const Center(
           child: Text(
-            'Cerca',
+            Constants.searchViewTitle,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
@@ -55,7 +52,7 @@ class _SearchState extends State<Search> {
                   final searchResults = snapshot.data!;
                   if (searchResults.isEmpty) {
                     return const Center(
-                      child: Text('Nessun risultato trovato'),
+                      child: const SizedBox.shrink(),
                     );
                   } else {
                     return ListView.builder(
@@ -71,7 +68,9 @@ class _SearchState extends State<Search> {
                 } else if (_viewModel.isSearching()) {
                   return const Center(child: CircularProgressIndicator());
                 } else {
-                  return Container(); // Mostra una lista vuota se la ricerca è vuota
+                  return const Center(
+                    child: const SizedBox.shrink(),
+                  );
                 }
               },
             ),
@@ -79,5 +78,11 @@ class _SearchState extends State<Search> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
   }
 }

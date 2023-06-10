@@ -2,56 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:pinpoint/model/post.dart';
 import 'package:pinpoint/viewmodel/feed_viewmodel.dart';
 import 'package:pinpoint/widget/post_widget.dart';
-import 'package:provider/provider.dart';
 
 /// Classe che mostra la pagina Feed
-class Feed extends StatelessWidget {
+class Feed extends StatefulWidget {
   const Feed({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider<FeedViewModel>(
-      create: (_) => FeedViewModel(),
-      child: Consumer<FeedViewModel>(
-        builder: (context, viewModel, _) {
-          return _FeedState(viewModel: viewModel);
-        },
-      ),
-    );
-  }
-}
-class _FeedState extends StatefulWidget {
-  final FeedViewModel viewModel;
-  const _FeedState({required this.viewModel});
-
-  @override
-  State<_FeedState> createState() => _FeedStateState();
+  _FeedState createState() => _FeedState();
 }
 
-class _FeedStateState extends State<_FeedState> {
-  late List<Post> _postList = [];
+class _FeedState extends State<Feed> {
+  late FeedViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _fetchPosts();
-  }
-
-  Future<void> _fetchPosts() async {
-    try {
-      final posts = await widget.viewModel.fetchPosts();
-      if (mounted) {
-        setState(() {
-          _postList = posts;
-        });
-      }
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.toString()),
-        ),
-      );
-    }
+    _viewModel = FeedViewModel();
   }
 
   @override
@@ -65,13 +31,32 @@ class _FeedStateState extends State<_FeedState> {
           ),
         ),
       ),
-      body: ListView.builder(
-        itemCount: _postList.length,
-        itemBuilder: (context, index) {
-          final post = _postList[index];
-          return PostWidget(post: post, isProfile: false);
+      body: StreamBuilder<List<Post>>(
+        stream: _viewModel.postsStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final posts = snapshot.data!;
+            return ListView.builder(
+              itemCount: posts.length,
+              itemBuilder: (context, index) {
+                final post = posts[index];
+                return PostWidget(post: post, isProfile: false);
+              },
+            );
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            return const CircularProgressIndicator();
+          }
         },
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
+  }
 }
+
