@@ -24,7 +24,6 @@ class ProfileViewModel {
       final thatUser = await _databaseQueries.getCurrentUserInfoStream();
       thatUser.listen((user) {
         _utenteController.add(user);
-        print('Utente: ${user.username}');
       });
 
 

@@ -7,8 +7,7 @@ import 'package:pinpoint/repo/database_queries.dart';
 /// ViewModel che gestisce la pagina di ricerca
 class SearchViewModel {
   final TextEditingController searchController = TextEditingController();
-  final StreamController<List<Utente>> _searchResultsController =
-  StreamController<List<Utente>>.broadcast();
+  final StreamController<List<Utente>> _searchResultsController = StreamController<List<Utente>>();
 
   Stream<List<Utente>> get searchResultsStream => _searchResultsController.stream;
 
@@ -20,14 +19,16 @@ class SearchViewModel {
       return;
     }
 
-    final userList = await DatabaseQueries().getAllUsersExceptMeThatMatch(query);
-    _searchResultsController.sink.add(userList);
+    final thatUser = await DatabaseQueries().getAllUsersExceptMeThatMatch(query);
+    thatUser.listen((user) {
+      _searchResultsController.add(user);
+    });
   }
 
   /// Metodo che permette di cancellare la ricerca. Svuota la lista degli utenti.
   void cancelSearch() {
     searchController.clear();
-    _searchResultsController.sink.add([]);
+    _searchResultsController.add([]);
   }
 
   /// Metodo che permette di ottenere se la ricerca è attiva, ossia se l'utente sta digitando qualcosa.

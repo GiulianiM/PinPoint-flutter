@@ -20,4 +20,18 @@ class Utente {
     this.longitude,
     this.uid,
   });
+
+  factory Utente.fromMap(Map<dynamic, dynamic> data) {
+    return Utente(
+      username: data['username'] as String?,
+      fullname: data['fullname'] as String?,
+      image: data['image'] as String?,
+      bio: data['bio'] as String?,
+      email: data['email'] as String?,
+      latitude: data['latitude'] as String?,
+      longitude: data['longitude'] as String?,
+      uid: data['uid'] as String?,
+    );
+  }
+
 }

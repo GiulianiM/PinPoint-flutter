@@ -51,28 +51,23 @@ class DatabaseQueries {
   /// + uid
   Stream<Utente> getCurrentUserInfoStream() {
     final usersStreamController = StreamController<Utente>();
-    _usersRef.child(_auth.currentUser!.uid).once().then((snapshot) {
-      final data = snapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+    _usersRef.child(_auth.currentUser!.uid).onValue.listen((event) {
+      final snapshot = event.snapshot;
+      final data = snapshot.value as Map<dynamic, dynamic>?;
       if (data != null) {
-        final user = Utente(
-          username: data['username'] as String?,
-          fullname: data['fullname'] as String?,
-          image: data['image'] as String?,
-          bio: data['bio'] as String?,
-          email: data['email'] as String?,
-          latitude: data['latitude'] as String?,
-          longitude: data['longitude'] as String?,
-          uid: data['uid'] as String?,
-        );
+        final user = Utente.fromMap(data);
         usersStreamController.add(user);
       }
     });
+
     return usersStreamController.stream;
   }
 
+
   /// Metodo che ritorna le informazioni di un utente dato il suo username
-  Future<List<Utente>> getAllUsersExceptMeThatMatch(String username) {
-    final completer = Completer<List<Utente>>();
+  Stream<List<Utente>> getAllUsersExceptMeThatMatch(String username) {
+    final usersStreamController = StreamController<List<Utente>>();
 
     _usersRef.onValue.listen((event) {
       final data = event.snapshot.value as Map<dynamic, dynamic>?;
@@ -82,21 +77,12 @@ class DatabaseQueries {
             .where((entry) => entry.key != _auth.currentUser!.uid)
             .where((entry) =>
                 entry.value['username'].toString().contains(username))
-            .map((entry) => Utente(
-                  username: entry.value['username'] as String?,
-                  fullname: entry.value['fullname'] as String?,
-                  image: entry.value['image'] as String?,
-                  bio: entry.value['bio'] as String?,
-                  email: entry.value['email'] as String?,
-                  latitude: entry.value['latitude'] as String?,
-                  longitude: entry.value['longitude'] as String?,
-                  uid: entry.value['uid'] as String?,
-                ))
+            .map((entry) => Utente.fromMap(entry.value as Map<dynamic, dynamic>))
             .toList();
-        completer.complete(userList);
+        usersStreamController.add(userList);
       }
     });
-    return completer.future;
+    return usersStreamController.stream;
   }
 
   /// Metodo che ritorna tutti gli utenti tranne l'utente corrente come uno stream
@@ -108,16 +94,7 @@ class DatabaseQueries {
       if (data != null) {
         final userList = data.entries
             .where((entry) => entry.key != _auth.currentUser!.uid)
-            .map((entry) => Utente(
-                  username: entry.value['username'] as String?,
-                  fullname: entry.value['fullname'] as String?,
-                  image: entry.value['image'] as String?,
-                  bio: entry.value['bio'] as String?,
-                  email: entry.value['email'] as String?,
-                  latitude: entry.value['latitude'] as String?,
-                  longitude: entry.value['longitude'] as String?,
-                  uid: entry.value['uid'] as String?,
-                ))
+            .map((entry) => Utente.fromMap(entry.value as Map<dynamic, dynamic>))
             .toList();
 
         usersStreamController.add(userList);
@@ -226,48 +203,68 @@ class DatabaseQueries {
   /// Metodo che ritorna il numero di follower dell'utente corrente.
   /// Ritorna il numero di follower.
   Stream<int> getFollowerCountStream() async* {
-    final snapshot = await _followsRef
+    final followersStreamController = StreamController<int>();
+    _followsRef
         .child(_auth.currentUser!.uid)
         .child('followers')
-        .get();
-    if (snapshot.value != null && snapshot.value is Map) {
-      final followers = Map<String, dynamic>.from(snapshot.value as Map);
-      yield followers.length;
-    } else {
-      yield 0;
-    }
+        .onValue
+        .listen((event) {
+      final snapshot = event.snapshot;
+      if (snapshot.value != null && snapshot.value is Map) {
+        final followers = Map<String, dynamic>.from(snapshot.value as Map);
+        followersStreamController.add(followers.length);
+      } else {
+        followersStreamController.add(0);
+      }
+    });
+
+    yield* followersStreamController.stream;
   }
+
 
 
   /// Metodo che ritorna il numero di following dell'utente corrente.
   /// Ritorna il numero di following
   Stream<int> getFollowingCountStream() async* {
-    final snapshot = await _followsRef
+    final followingStreamController = StreamController<int>();
+
+    _followsRef
         .child(_auth.currentUser!.uid)
         .child('following')
-        .get();
+        .onValue
+        .listen((event) {
+      final snapshot = event.snapshot;
+      if (snapshot.value != null && snapshot.value is Map) {
+        final following = Map<String, dynamic>.from(snapshot.value as Map);
+        followingStreamController.add(following.length);
+      } else {
+        followingStreamController.add(0);
+      }
+    });
 
-    if (snapshot.value != null && snapshot.value is Map) {
-      final followers = Map<String, dynamic>.from(snapshot.value as Map);
-      yield followers.length;
-    } else {
-      yield 0;
-    }
+    yield* followingStreamController.stream;
   }
+
 
 
   /// Metodo che ritorna il numero di post dell'utente corrente.
   /// Ritorna il numero di post
   Stream<int> getPostCountStream() async* {
-    final snapshot = await _postsRef.child(_auth.currentUser!.uid).get();
+    final postCountStreamController = StreamController<int>();
 
-    if (snapshot.value != null && snapshot.value is Map) {
-      final posts = Map<String, dynamic>.from(snapshot.value as Map);
-      yield posts.length;
-    } else {
-      yield 0;
-    }
+    _postsRef.child(_auth.currentUser!.uid).onValue.listen((event) {
+      final snapshot = event.snapshot;
+      if (snapshot.value != null && snapshot.value is Map) {
+        final posts = Map<String, dynamic>.from(snapshot.value as Map);
+        postCountStreamController.add(posts.length);
+      } else {
+        postCountStreamController.add(0);
+      }
+    });
+
+    yield* postCountStreamController.stream;
   }
+
 
 
   /// Metodo che genera una stringa random.
